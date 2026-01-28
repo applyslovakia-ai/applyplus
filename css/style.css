@@ -1,0 +1,70 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+body {
+    font-family: 'Inter', sans-serif;
+    /* Светлый фон с мягкими градиентными пятнами */
+    background-color: #f3f4f6;
+    background-image: 
+        radial-gradient(at 0% 0%, rgba(56, 189, 248, 0.3) 0px, transparent 50%),
+        radial-gradient(at 100% 0%, rgba(167, 139, 250, 0.3) 0px, transparent 50%),
+        radial-gradient(at 100% 100%, rgba(56, 189, 248, 0.3) 0px, transparent 50%),
+        radial-gradient(at 0% 100%, rgba(167, 139, 250, 0.3) 0px, transparent 50%);
+    background-attachment: fixed; /* Фон стоит на месте при скролле */
+    
+    min-height: 100vh;
+    margin: 0;
+    color: #1e293b;
+}
+
+/* Стекло для Навигации и Фильтров */
+.glass-panel {
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+}
+
+/* Стекло для Карточек */
+.glass-card {
+    background: rgba(255, 255, 255, 0.65); /* Чуть более прозрачные */
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.9);
+    box-shadow: 
+        0 4px 6px -1px rgba(0, 0, 0, 0.02),
+        0 2px 4px -1px rgba(0, 0, 0, 0.02);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+/* Эффект свечения при наведении */
+.glass-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: linear-gradient(120deg, rgba(255,255,255,0) 30%, rgba(255,255,255,0.6) 50%, rgba(255,255,255,0) 70%);
+    transform: translateX(-100%);
+    transition: transform 0.6s;
+}
+
+.glass-card:hover {
+    transform: translateY(-5px) scale(1.01);
+    background: rgba(255, 255, 255, 0.9);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    border-color: #3b82f6; /* Синяя обводка при наведении */
+}
+
+.glass-card:hover::before {
+    transform: translateX(100%);
+}
+
+/* Стили для выпадающих списков (Select) */
+.custom-select {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+    background-position: right 0.5rem center;
+    background-repeat: no-repeat;
+    background-size: 1.5em 1.5em;
+    padding-right: 2.5rem;
+}

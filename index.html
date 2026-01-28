@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ApplyPlus / цифровая платформа</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
+    
+    <style>
+        /* --- ДИЗАЙН --- */
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            background-color: #f3f4f6;
+            min-height: 100vh;
+            color: #1e293b;
+            background: 
+                radial-gradient(at 0% 0%, rgba(96, 165, 250, 0.2) 0px, transparent 50%),
+                radial-gradient(at 100% 0%, rgba(192, 132, 252, 0.2) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(96, 165, 250, 0.2) 0px, transparent 50%),
+                radial-gradient(at 0% 100%, rgba(244, 114, 182, 0.2) 0px, transparent 50%);
+            background-attachment: fixed;
+            background-size: cover;
+        }
+
+        .nav-glass {
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.65);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            border-radius: 24px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), inset 0 1px 1px rgba(255, 255, 255, 0.8);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .glass-card:hover {
+            transform: translateY(-6px) scale(1.01);
+            background: rgba(255, 255, 255, 0.85);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+            border-color: rgba(96, 165, 250, 0.6);
+        }
+
+        .input-glass {
+            background: rgba(255, 255, 255, 0.5);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            transition: all 0.2s;
+        }
+        .input-glass:focus {
+            background: rgba(255, 255, 255, 0.8);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.2);
+            border-color: #3b82f6;
+        }
+
+        .logo-gradient {
+            background: linear-gradient(135deg, #2563eb 0%, #9333ea 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+    </style>
+</head>
+<body class="antialiased">
+
+    <nav class="fixed w-full z-50 top-0 nav-glass transition-all">
+        <div class="max-w-7xl mx-auto px-6 h-20 flex justify-between items-center">
+            <div class="flex items-center gap-3 cursor-pointer group" onclick="resetFilters()">
+                <div class="flex flex-col justify-center">
+                    <span class="font-black text-2xl tracking-tight logo-gradient leading-none">ApplyPlus</span>
+                    <span class="text-[10px] font-bold text-slate-500 uppercase tracking-[0.2em] mt-0.5 group-hover:text-blue-600 transition-colors">цифровая платформа</span>
+                </div>
+            </div>
+            <a href="https://wa.me/421905877853" target="_blank" class="bg-slate-900/90 backdrop-blur text-white px-5 py-2.5 rounded-full text-sm font-semibold hover:bg-blue-600 transition-all shadow-md flex items-center gap-2">
+                Связаться
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+            </a>
+        </div>
+    </nav>
+
+    <main class="pt-36 pb-20 px-4 max-w-7xl mx-auto">
+        <div class="mb-12">
+            <h1 class="text-3xl md:text-4xl font-extrabold text-slate-900 mb-8 leading-tight text-center md:text-left">
+                Программы обучения
+            </h1>
+            
+            <div class="glass-card p-1.5 max-w-full flex flex-col md:flex-row gap-2 shadow-lg shadow-blue-900/5">
+                <div class="flex-grow relative">
+                    <input type="text" id="searchInput" class="input-glass block w-full pl-6 pr-4 py-3 rounded-xl text-slate-800 placeholder-slate-400 font-medium" placeholder="Поиск специальности...">
+                </div>
+                <div class="w-full md:w-60 relative">
+                    <select id="uniFilter" class="input-glass block w-full pl-4 pr-10 py-3 rounded-xl text-slate-700 font-medium appearance-none cursor-pointer truncate">
+                        <option value="">Все ВУЗы</option>
+                    </select>
+                </div>
+                <div class="w-full md:w-60 relative">
+                    <select id="catFilter" class="input-glass block w-full pl-4 pr-10 py-3 rounded-xl text-slate-700 font-medium appearance-none cursor-pointer truncate">
+                        <option value="">Все направления</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="flex justify-end mb-6 px-2">
+            <div class="text-sm font-medium text-slate-500 bg-white/50 px-3 py-1 rounded-lg backdrop-blur-sm">
+                Найдено: <span id="resultCount" class="text-blue-600 font-bold">0</span>
+            </div>
+        </div>
+
+        <div id="programsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+    </main>
+
+    <script src="js/data.js"></script>
+
+    <script>
+        let universitiesData = [];
+        
+        function parseData() {
+            if(typeof rawData === 'undefined') {
+                console.error("Нет данных! Проверьте файл data.js");
+                return;
+            }
+
+            const result = Papa.parse(rawData.trim(), {
+                header: true,
+                skipEmptyLines: true
+            });
+
+            result.data.forEach(row => {
+                universitiesData.push({
+                    university: row.university,
+                    shortName: row.shortName,
+                    faculty: row.faculty,
+                    nameRu: row.nameRu,
+                    nameSk: row.nameSk,
+                    category: row.category,
+                    categoryName: row.categoryName,
+                    level: row.level,
+                    method: row.method
+                });
+            });
+
+            initApp();
+        }
+
+        const grid = document.getElementById('programsGrid');
+        const searchInput = document.getElementById('searchInput');
+        const uniFilter = document.getElementById('uniFilter');
+        const catFilter = document.getElementById('catFilter');
+        const resultCount = document.getElementById('resultCount');
+
+        function initApp() {
+            const unis = new Set(universitiesData.map(u => u.university));
+            Array.from(unis).sort().forEach(uni => {
+                const opt = document.createElement('option');
+                opt.value = uni;
+                opt.innerText = uni;
+                uniFilter.appendChild(opt);
+            });
+
+            const cats = new Set(universitiesData.map(u => `${u.category}|${u.categoryName}`));
+            Array.from(cats).sort((a,b) => a.split('|')[1].localeCompare(b.split('|')[1])).forEach(c => {
+                const [val, name] = c.split('|');
+                const opt = document.createElement('option');
+                opt.value = val;
+                opt.innerText = name;
+                catFilter.appendChild(opt);
+            });
+
+            render();
+        }
+
+        function createCard(item) {
+            return `
+                <div class="glass-card p-6 flex flex-col h-full group cursor-pointer relative overflow-hidden">
+                    <div class="flex items-start justify-between mb-3 relative z-10">
+                        <span class="bg-blue-600 text-white shadow-lg shadow-blue-500/30 border border-blue-500/50 px-3 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider">
+                            ${item.categoryName}
+                        </span>
+                    </div>
+
+                    <h3 class="text-xl font-bold text-slate-900 mb-1 leading-snug group-hover:text-blue-600 transition-colors relative z-10">
+                        ${item.nameRu}
+                    </h3>
+                    <p class="text-sm text-slate-500 italic mb-6 font-medium relative z-10">
+                        ${item.nameSk}
+                    </p>
+                    
+                    <div class="mt-auto relative z-10">
+                        <div class="mb-3">
+                            <p class="text-sm font-bold text-slate-700 truncate mb-0.5">${item.university}</p>
+                            <p class="text-xs text-slate-500 truncate font-medium opacity-80">${item.faculty}</p>
+                        </div>
+                        
+                        <div class="flex flex-wrap gap-2 border-t border-blue-100/50 pt-3 font-medium text-[11px] uppercase tracking-wide text-blue-700">
+                            <span class="bg-blue-50 px-2 py-1 rounded-md">
+                                ${item.level}
+                            </span>
+                            <span class="bg-blue-50 px-2 py-1 rounded-md">
+                                ${item.method}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function render() {
+            const search = searchInput.value.toLowerCase();
+            const fUni = uniFilter.value;
+            const fCat = catFilter.value;
+            
+            const matches = universitiesData.filter(item => {
+                const matchUni = !fUni || item.university === fUni;
+                const matchCat = !fCat || item.category === fCat;
+                const matchSearch = item.nameRu.toLowerCase().includes(search) || 
+                                    item.nameSk.toLowerCase().includes(search);
+                return matchUni && matchCat && matchSearch;
+            });
+
+            matches.sort((a, b) => a.nameRu.localeCompare(b.nameRu));
+
+            if(matches.length === 0) {
+                grid.innerHTML = `<div class="col-span-full text-center py-20 text-slate-500">Ничего не найдено 😔 <br> <button onclick="resetFilters()" class="text-blue-600 mt-4 font-bold hover:underline">Сбросить фильтры</button></div>`;
+            } else {
+                grid.innerHTML = matches.map(createCard).join('');
+            }
+            resultCount.innerText = matches.length;
+        }
+
+        window.resetFilters = () => {
+            searchInput.value = '';
+            uniFilter.value = '';
+            catFilter.value = '';
+            render();
+        };
+
+        searchInput.addEventListener('input', render);
+        uniFilter.addEventListener('change', render);
+        catFilter.addEventListener('change', render);
+
+        document.addEventListener('DOMContentLoaded', parseData);
+    </script>
+</body>
+</html>
