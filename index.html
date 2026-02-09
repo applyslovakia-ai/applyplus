@@ -5,17 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ApplyPlus / цифровая платформа</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
     
     <style>
-        /* --- ДИЗАЙН --- */
+        /* --- ОСНОВНОЙ ДИЗАЙН --- */
         body {
             font-family: 'Inter', sans-serif;
             margin: 0;
             background-color: #f3f4f6;
             min-height: 100vh;
             color: #1e293b;
+            /* Живой градиентный фон */
             background: 
                 radial-gradient(at 0% 0%, rgba(96, 165, 250, 0.2) 0px, transparent 50%),
                 radial-gradient(at 100% 0%, rgba(192, 132, 252, 0.2) 0px, transparent 50%),
@@ -25,49 +26,54 @@
             background-size: cover;
         }
 
+        /* Стеклянная навигация */
         .nav-glass {
-            background: rgba(255, 255, 255, 0.6);
+            background: rgba(255, 255, 255, 0.65);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
             border-bottom: 1px solid rgba(255, 255, 255, 0.3);
         }
 
+        /* Стеклянная карточка */
         .glass-card {
-            background: rgba(255, 255, 255, 0.65);
+            background: rgba(255, 255, 255, 0.75);
             backdrop-filter: blur(24px);
             -webkit-backdrop-filter: blur(24px);
             border: 1px solid rgba(255, 255, 255, 0.6);
             border-radius: 24px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), inset 0 1px 1px rgba(255, 255, 255, 0.8);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), inset 0 1px 1px rgba(255, 255, 255, 0.9);
             transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .glass-card:hover {
             transform: translateY(-6px) scale(1.01);
-            background: rgba(255, 255, 255, 0.85);
+            background: rgba(255, 255, 255, 0.9);
             box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
             border-color: rgba(96, 165, 250, 0.6);
         }
 
+        /* Стеклянные поля ввода */
         .input-glass {
-            background: rgba(255, 255, 255, 0.5);
+            background: rgba(255, 255, 255, 0.6);
             backdrop-filter: blur(12px);
             border: 1px solid rgba(255, 255, 255, 0.5);
             transition: all 0.2s;
         }
         .input-glass:focus {
-            background: rgba(255, 255, 255, 0.8);
+            background: rgba(255, 255, 255, 0.95);
             outline: none;
             box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.2);
             border-color: #3b82f6;
         }
 
+        /* Градиент для логотипа */
         .logo-gradient {
             background: linear-gradient(135deg, #2563eb 0%, #9333ea 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
         
+        /* Кастомный скроллбар */
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
@@ -91,10 +97,13 @@
     </nav>
 
     <main class="pt-36 pb-20 px-4 max-w-7xl mx-auto">
-        <div class="mb-12">
-            <h1 class="text-3xl md:text-4xl font-extrabold text-slate-900 mb-8 leading-tight text-center md:text-left">
-                Программы обучения
+        <div class="mb-12 text-center md:text-left">
+            <h1 class="text-3xl md:text-5xl font-extrabold text-slate-900 mb-4 leading-tight tracking-tight">
+                Цифровой каталог бакалаврских программ обучения
             </h1>
+            <p class="text-lg md:text-xl text-slate-500 font-medium max-w-3xl mb-10 leading-relaxed">
+                для поступления в университеты СР на 2026/2027 академический год
+            </p>
             
             <div class="glass-card p-1.5 max-w-full flex flex-col md:flex-row gap-2 shadow-lg shadow-blue-900/5">
                 <div class="flex-grow relative">
@@ -127,18 +136,26 @@
     <script>
         let universitiesData = [];
         
+        // Функция чтения и обработки данных из rawData (которая в js/data.js)
         function parseData() {
             if(typeof rawData === 'undefined') {
-                console.error("Нет данных! Проверьте файл data.js");
+                console.error("Ошибка: Нет данных! Проверьте файл js/data.js");
+                grid.innerHTML = `<div class="col-span-full text-center text-red-500 py-10">Ошибка загрузки данных. Проверьте файл data.js</div>`;
                 return;
             }
 
+            // Парсим TSV (Tab Separated Values)
             const result = Papa.parse(rawData.trim(), {
                 header: true,
-                skipEmptyLines: true
+                skipEmptyLines: true,
+                delimiter: "\t" // Явно указываем разделитель табуляции
             });
 
+            // Преобразуем в удобный массив объектов
             result.data.forEach(row => {
+                // Пропускаем пустые строки, если попадутся
+                if(!row.nameRu) return;
+
                 universitiesData.push({
                     university: row.university,
                     shortName: row.shortName,
@@ -147,6 +164,8 @@
                     nameSk: row.nameSk,
                     category: row.category,
                     categoryName: row.categoryName,
+                    // Поля level и method больше не используются в карточке, 
+                    // но оставим их в данных на всякий случай.
                     level: row.level,
                     method: row.method
                 });
@@ -161,7 +180,9 @@
         const catFilter = document.getElementById('catFilter');
         const resultCount = document.getElementById('resultCount');
 
+        // Инициализация фильтров и первый рендер
         function initApp() {
+            // Заполняем фильтр ВУЗов
             const unis = new Set(universitiesData.map(u => u.university));
             Array.from(unis).sort().forEach(uni => {
                 const opt = document.createElement('option');
@@ -170,6 +191,7 @@
                 uniFilter.appendChild(opt);
             });
 
+            // Заполняем фильтр Категорий
             const cats = new Set(universitiesData.map(u => `${u.category}|${u.categoryName}`));
             Array.from(cats).sort((a,b) => a.split('|')[1].localeCompare(b.split('|')[1])).forEach(c => {
                 const [val, name] = c.split('|');
@@ -182,34 +204,31 @@
             render();
         }
 
+        // ШАБЛОН КАРТОЧКИ (ОБНОВЛЕННЫЙ)
         function createCard(item) {
             return `
                 <div class="glass-card p-6 flex flex-col h-full group cursor-pointer relative overflow-hidden">
-                    <div class="flex items-start justify-between mb-3 relative z-10">
+                    <div class="flex items-start justify-between mb-4 relative z-10">
                         <span class="bg-blue-600 text-white shadow-lg shadow-blue-500/30 border border-blue-500/50 px-3 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider">
                             ${item.categoryName}
                         </span>
                     </div>
 
-                    <h3 class="text-xl font-bold text-slate-900 mb-1 leading-snug group-hover:text-blue-600 transition-colors relative z-10">
+                    <h3 class="text-[22px] font-extrabold text-slate-900 mb-2 leading-snug group-hover:text-blue-700 transition-colors relative z-10">
                         ${item.nameRu}
                     </h3>
-                    <p class="text-sm text-slate-500 italic mb-6 font-medium relative z-10">
+                    <p class="text-sm text-slate-500 italic mb-8 font-medium relative z-10">
                         ${item.nameSk}
                     </p>
                     
-                    <div class="mt-auto relative z-10">
-                        <div class="mb-3">
-                            <p class="text-sm font-bold text-slate-700 truncate mb-0.5">${item.university}</p>
-                            <p class="text-xs text-slate-500 truncate font-medium opacity-80">${item.faculty}</p>
+                    <div class="mt-auto border-t border-blue-100/50 pt-4 relative z-10 flex justify-between items-end">
+                        <div class="flex flex-col pr-2 overflow-hidden">
+                            <p class="text-sm font-bold text-slate-800 truncate mb-0.5">${item.university}</p>
+                            <p class="text-[11px] text-slate-500 truncate font-medium opacity-80 uppercase tracking-wide">${item.faculty}</p>
                         </div>
-                        
-                        <div class="flex flex-wrap gap-2 border-t border-blue-100/50 pt-3 font-medium text-[11px] uppercase tracking-wide text-blue-700">
-                            <span class="bg-blue-50 px-2 py-1 rounded-md">
-                                ${item.level}
-                            </span>
-                            <span class="bg-blue-50 px-2 py-1 rounded-md">
-                                ${item.method}
+                        <div class="flex-shrink-0">
+                             <span class="bg-emerald-100 text-emerald-700 border border-emerald-200 px-3 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider shadow-sm">
+                                Бесплатно
                             </span>
                         </div>
                     </div>
@@ -217,21 +236,25 @@
             `;
         }
 
+        // Функция отрисовки (Рендер)
         function render() {
             const search = searchInput.value.toLowerCase();
             const fUni = uniFilter.value;
             const fCat = catFilter.value;
             
+            // Фильтрация
             const matches = universitiesData.filter(item => {
                 const matchUni = !fUni || item.university === fUni;
                 const matchCat = !fCat || item.category === fCat;
-                const matchSearch = item.nameRu.toLowerCase().includes(search) || 
-                                    item.nameSk.toLowerCase().includes(search);
+                const matchSearch = (item.nameRu && item.nameRu.toLowerCase().includes(search)) || 
+                                    (item.nameSk && item.nameSk.toLowerCase().includes(search));
                 return matchUni && matchCat && matchSearch;
             });
 
+            // Сортировка по алфавиту
             matches.sort((a, b) => a.nameRu.localeCompare(b.nameRu));
 
+            // Вывод результатов
             if(matches.length === 0) {
                 grid.innerHTML = `<div class="col-span-full text-center py-20 text-slate-500">Ничего не найдено 😔 <br> <button onclick="resetFilters()" class="text-blue-600 mt-4 font-bold hover:underline">Сбросить фильтры</button></div>`;
             } else {
@@ -240,6 +263,7 @@
             resultCount.innerText = matches.length;
         }
 
+        // Сброс фильтров
         window.resetFilters = () => {
             searchInput.value = '';
             uniFilter.value = '';
@@ -247,10 +271,12 @@
             render();
         };
 
+        // Слушатели событий
         searchInput.addEventListener('input', render);
         uniFilter.addEventListener('change', render);
         catFilter.addEventListener('change', render);
 
+        // Запуск при загрузке страницы
         document.addEventListener('DOMContentLoaded', parseData);
     </script>
 </body>
