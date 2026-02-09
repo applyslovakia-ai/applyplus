@@ -16,7 +16,6 @@
             background-color: #f3f4f6;
             min-height: 100vh;
             color: #1e293b;
-            /* Живой фон */
             background: 
                 radial-gradient(at 0% 0%, rgba(96, 165, 250, 0.2) 0px, transparent 50%),
                 radial-gradient(at 100% 0%, rgba(192, 132, 252, 0.2) 0px, transparent 50%),
@@ -129,7 +128,7 @@
         </div>
     </main>
 
-    <script src="js/data.js?v=2"></script>
+    <script src="js/data.js"></script>
 
     <script>
         let universitiesData = [];
@@ -146,6 +145,8 @@
                 delimiter: "\t"
             });
 
+            // Мы больше не зависим от коротких кодов (category), 
+            // используем только полные имена для надежности.
             result.data.forEach(row => {
                 if(!row.nameRu) return;
                 universitiesData.push(row);
@@ -170,14 +171,19 @@
                 uniFilter.appendChild(opt);
             });
 
-            // Категории
-            const cats = new Set(universitiesData.map(u => `${u.category}|${u.categoryName}`));
-            Array.from(cats).sort((a,b) => a.split('|')[1].localeCompare(b.split('|')[1])).forEach(c => {
-                const [val, name] = c.split('|');
-                const opt = document.createElement('option');
-                opt.value = val;
-                opt.innerText = name;
-                catFilter.appendChild(opt);
+            // Категории: ТЕПЕРЬ ФИЛЬТРУЕМ ПОЛНОСТЬЮ ПО НАЗВАНИЮ (Russian Name)
+            // Это решает проблему рассинхрона кодов
+            const cats = new Set(universitiesData.map(u => u.categoryName));
+            
+            // Сортируем и убираем пустые
+            Array.from(cats)
+                .filter(c => c && c.trim() !== "")
+                .sort()
+                .forEach(catName => {
+                    const opt = document.createElement('option');
+                    opt.value = catName; // Значение фильтра = Название на русском
+                    opt.innerText = catName;
+                    catFilter.appendChild(opt);
             });
 
             render();
@@ -216,7 +222,11 @@
             
             const matches = universitiesData.filter(item => {
                 const matchUni = !fUni || item.university === fUni;
-                const matchCat = !fCat || item.category === fCat;
+                
+                // ИСПРАВЛЕННАЯ ЛОГИКА ФИЛЬТРА ПО КАТЕГОРИИ
+                // Сравниваем Название с Названием
+                const matchCat = !fCat || item.categoryName === fCat;
+                
                 const matchSearch = (item.nameRu && item.nameRu.toLowerCase().includes(search)) || 
                                     (item.nameSk && item.nameSk.toLowerCase().includes(search));
                 return matchUni && matchCat && matchSearch;
